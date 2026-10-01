@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore how dopamine modulates the direct and indirect basal ganglia pathways in the classical simplified model.">
+<title>Dopamine explorer</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23101828'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23f8c95b'/%3E%3Cpath d='M3 16h6m14 0h6' stroke='%23f8c95b' stroke-width='3'/%3E%3C/svg%3E">
+<style>
+:root{color-scheme:dark;--bg:#101828;--fg:#f1f5f9;--muted:#a6b4ca;--blue:#58a6ff;--red:#ff737f;--gold:#f8c95b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}main{max-width:1250px;margin:auto;padding:24px 24px 28px}h1{font-size:clamp(24px,3vw,32px);font-weight:650;letter-spacing:-.025em;margin:0 0 22px;text-align:center}.control{max-width:900px;margin:0 auto 8px}label{display:flex;justify-content:space-between;gap:16px;align-items:baseline;margin-bottom:8px}output{color:var(--gold);font-size:20px;font-weight:650;font-variant-numeric:tabular-nums}input[type=range]{display:block;width:100%;height:28px;accent-color:var(--gold);cursor:pointer}input:focus-visible{outline:2px solid var(--gold);outline-offset:5px;border-radius:6px}.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:14px}.diagram-wrap{overflow-x:auto;overscroll-behavior-x:contain;border-radius:8px;margin-top:12px}.diagram-wrap:focus-visible{outline:2px solid var(--gold)}svg{display:block;width:100%;min-width:920px;height:auto;font-family:inherit}.legend{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 24px;font-size:14px;margin:8px 0 12px}.key{display:flex;align-items:center;gap:8px}.swatch{width:24px;height:3px;background:var(--blue)}.swatch.red{height:0;border-top:3px dashed var(--red);background:transparent}.swatch.gold{background:var(--gold)}.lut{display:flex;align-items:center;justify-content:center;gap:12px;color:var(--muted);font-size:14px;margin:12px 0}.gradient{height:10px;width:170px;border-radius:3px;background:linear-gradient(90deg,#000,#360060,#a00020,#f04400,#ffb000,#ffff60,#fff);border:1px solid #64748b}footer{max-width:950px;margin:18px auto 0;text-align:center;color:var(--muted);font-size:14px}footer p{margin:6px 0}a{color:var(--blue);text-underline-offset:3px}.phone-hint{display:none;color:var(--muted);font-size:14px;margin:8px 0}#accessible-result{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}@media(max-width:960px){main{padding:18px 14px}.phone-hint{display:block}h1{text-align:left}.diagram-wrap{border:1px solid #334155}.legend{justify-content:flex-start}}
+
+/* Keep the entire working surface, through the LUT, within one viewport.
+   Supporting notes remain below it. No clipping or hidden page overflow. */
+main{padding:0 20px 24px}
+.workspace{height:100vh;height:100svh;display:flex;flex-direction:column;padding:12px 0 10px;gap:5px}
+.workspace>h1{font-size:clamp(22px,2.4vw,28px);line-height:1.2;margin:0 0 5px;flex:none}
+.control{width:100%;max-width:850px;margin:0 auto;flex:none}
+label{font-size:15px;line-height:1.3;margin-bottom:2px}
+output{font-size:18px}input[type=range]{height:24px}.scale{font-size:13px;line-height:1.3}
+.diagram-wrap{flex:1;min-height:0;margin-top:0;display:flex;align-items:center;justify-content:center;overflow:auto}
+svg{width:100%;height:100%;min-width:0;max-width:1200px;flex:none}
+.legend{margin:0;gap:4px 20px;line-height:1.3;flex:none}
+.lut{margin:2px 0 0;line-height:1.3;flex:none}
+.phone-hint{display:none}
+@media(max-width:960px){main{padding:0 10px 20px}.workspace>h1{text-align:center}.legend{justify-content:center;font-size:13px}.diagram-wrap{border:0}}
+@media(max-width:650px){.diagram-wrap{justify-content:flex-start}.diagram-wrap svg{width:920px;min-width:920px}.phone-hint{display:block;font-size:12px;margin:0;line-height:1.2;flex:none}.workspace{padding-top:8px}.legend{gap:3px 12px}}
+@media(max-height:600px){.workspace{gap:2px;padding:6px 0}.workspace>h1{font-size:20px;margin:0}label{font-size:14px}.scale{display:none}.legend,.lut{font-size:12px}}
+</style>
+</head>
+<body>
+<main>
+<section class="workspace" aria-label="Dopamine explorer">
+<h1>What changes when dopamine changes?</h1>
+<div class="control">
+<label for="dopamine"><span>Relative dopamine input from SNc</span><output id="da-value" for="dopamine">100%</output></label>
+<input id="dopamine" type="range" min="0" max="100" step="1" value="100" aria-describedby="scale-note" aria-valuetext="100 percent of the teaching reference">
+<div class="scale" id="scale-note"><span>0 · no dopamine input</span><span>100 · teaching reference</span></div>
+</div>
+<p class="phone-hint">Swipe across the diagram to see both pathways.</p>
+<div class="diagram-wrap" tabindex="0" role="region" aria-label="Basal ganglia diagram; scroll horizontally on small screens">
+<svg id="diagram" viewBox="0 0 1200 660" role="img" aria-labelledby="diagram-title diagram-description"><title id="diagram-title">Dopamine and the direct and indirect pathways</title><desc id="diagram-description">SNc supplies dopamine to D1 and D2 striatal neurons. The direct pathway inhibits GPi and SNr directly. The indirect pathway runs through GPe and STN. Both pathways affect inhibitory output to the thalamus and its excitation of motor cortex.</desc></svg>
+</div>
+<p id="accessible-result" role="status" aria-live="polite"></p>
+<div class="legend"><span class="key"><i class="swatch"></i>Glutamate · excitation</span><span class="key"><i class="swatch red"></i>GABA · inhibition</span><span class="key"><i class="swatch gold"></i>Dopamine · modulation</span></div>
+<div class="lut"><span>Lower activity</span><span class="gradient" aria-hidden="true"></span><span>Higher activity</span></div>
+</section>
+<noscript>This interactive model needs JavaScript enabled in your browser.</noscript>
+</main>
+<script>
+'use strict';
+// Teaching model ported directly from dopamine_explorer.py. No dependencies.
+const BG='#101828',FG='#f1f5f9',MUTED='#a6b4ca',BLUE='#58a6ff',RED='#ff737f',GOLD='#f8c95b';
+const svg=document.getElementById('diagram'),slider=document.getElementById('dopamine');
+function model(d){d=Math.max(0,Math.min(1,d));const direct=.15+.65*d,indirect=.85-.65*d,gpe=.9-.8*indirect,stn=.95-.8*gpe,output=.5+.55*stn-.5*direct;return{direct,indirect,gpe,stn,output,thalamus:1-output};}
+function blend(a,b,t){return '#'+[1,3,5].map(i=>Math.round(parseInt(a.slice(i,i+2),16)+(parseInt(b.slice(i,i+2),16)-parseInt(a.slice(i,i+2),16))*t).toString(16).padStart(2,'0')).join('');}
+function fire(v){const stops=['#000000','#360060','#a00020','#f04400','#ffb000','#ffff60','#ffffff'];const p=Math.max(0,Math.min(1,v))*6,i=Math.min(Math.floor(p),5);return blend(stops[i],stops[i+1],p-i);}
+function ink(col){return [.2126,.7152,.0722].reduce((s,w,i)=>s+w*parseInt(col.slice(1+i*2,3+i*2),16),0)>145?BG:FG;}
+function el(tag,attrs={},text='',parent=svg){const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const[k,v]of Object.entries(attrs))n.setAttribute(k,v);if(text)n.textContent=text;parent.appendChild(n);return n;}
+function text(x,y,value,color=FG,size=15,anchor='middle',weight=400,parent=svg){return el('text',{x,y,fill:color,'font-size':size,'text-anchor':anchor,'font-weight':weight},value,parent);}
+function line(x1,y1,x2,y2,color,strength,inhibitory=false,arrow=true){el('line',{x1,y1,x2,y2,stroke:color,'stroke-width':1+5*strength,'stroke-dasharray':inhibitory?'5 5':'none'});if(arrow){const a=Math.atan2(y2-y1,x2-x1),length=10+4*strength,half=4+2*strength;el('polygon',{points:`${x2},${y2} ${x2-length*Math.cos(a)+half*Math.sin(a)},${y2-length*Math.sin(a)-half*Math.cos(a)} ${x2-length*Math.cos(a)-half*Math.sin(a)},${y2-length*Math.sin(a)+half*Math.cos(a)}`,fill:color});}}
+function card(x,row,name,subtitle,value,key){const y=90+row*78,col=fire(value),fg=ink(col),g=el('g',{'data-node':key,'data-activity':value});el('rect',{x:x-175,y:y-30,width:350,height:60,rx:3,fill:col,stroke:'#64748b'},'',g);text(x-160,y-6,name,fg,18,'start',650,g);text(x-160,y+17,subtitle,fg,14,'start',400,g);el('rect',{x:x+82,y:y-15,width:77,height:8,fill:BG,rx:2},'',g);el('rect',{x:x+82,y:y-15,width:77*value,height:8,fill:GOLD,rx:2},'',g);text(x+120,y+7,value<.35?'LOWER':value>.65?'HIGHER':'MODERATE',fg,12,'middle',600,g);}
+function link(x,row,label,color,strength,inhibitory=false){const y=90+row*78;line(x,y+31,x,y+47,blend(BG,color,.2+.8*strength),strength,inhibitory);text(x+13,y+44,label,color,14,'start');}
+function column(x,direct,s){text(x,26,direct?'DIRECT · D1':'INDIRECT · D2',FG,23,'middle',650);text(x,51,direct?'Dopamine strengthens this route':'Dopamine restrains this route',MUTED,15);card(x,0,'Cortex','Same excitatory input throughout',.65,direct?'cortex-d':'cortex-i');card(x,1,direct?'Striatum · D1 neurons':'Striatum · D2 neurons','Putamen / caudate · GABA neurons',direct?s.direct:s.indirect,direct?'direct':'indirect');link(x,0,'Glutamate · excites',BLUE,.65);if(direct){line(x,199,x,371,blend(BG,RED,.2+.8*s.direct),s.direct,true);text(x+14,279,'GABA · inhibits GPi/SNr',RED,15,'start');text(x+14,303,'Direct connection',MUTED,14,'start');}else{card(x,2,'GPe','External globus pallidus · GABA',s.gpe,'gpe');card(x,3,'STN','Subthalamic nucleus · glutamate',s.stn,'stn');link(x,1,'GABA · inhibits',RED,s.indirect,true);link(x,2,'GABA · inhibits (tonic)',RED,s.gpe,true);link(x,3,'Glutamate · excites',BLUE,s.stn);}card(x,4,'GPi / SNr','Shared output nuclei · GABA',s.output,direct?'output-d':'output-i');card(x,5,'Motor thalamus','Ventral anterior / ventral lateral',s.thalamus,direct?'thalamus-d':'thalamus-i');card(x,6,'Motor cortex','Receives thalamic glutamate',s.thalamus,direct?'motor-d':'motor-i');link(x,4,'GABA · inhibits (tonic)',RED,s.output,true);link(x,5,'Glutamate · excites',BLUE,s.thalamus);}
+function render(){const percent=Number(slider.value),d=percent/100,s=model(d);svg.querySelectorAll(':scope > :not(title):not(desc)').forEach(n=>n.remove());column(250,true,s);column(950,false,s);const col=fire(d),fg=ink(col),g=el('g',{'data-node':'snc','data-output':d});el('rect',{x:515,y:136,width:170,height:64,rx:3,fill:col,stroke:GOLD,'stroke-width':2},'',g);text(600,162,'SNc',fg,21,'middle',650,g);text(600,187,`DA output: ${percent}%`,fg,16,'middle',500,g);text(600,230,'Substantia nigra',MUTED,14);text(600,250,'pars compacta',MUTED,14);const da=blend(BG,GOLD,.15+.85*d);line(513,168,428,168,da,d,false,d>0);line(687,168,772,168,da,d,false,d>0);text(470,149,'DA',GOLD,15,'middle',650);text(730,149,'DA',GOLD,15,'middle',650);const result=percent>=65?'MORE movement facilitation':percent<=35?'LESS movement facilitation':'INTERMEDIATE movement facilitation';text(600,635,`Shared result: ${result}`,GOLD,20,'middle',650);document.getElementById('da-value').textContent=`${percent}%`;slider.setAttribute('aria-valuetext',`${percent} percent of the teaching reference`);document.getElementById('accessible-result').textContent=`Dopamine ${percent} percent. Direct-pathway activity ${s.direct<.35?'lower':s.direct>.65?'higher':'moderate'}. Indirect-pathway activity ${s.indirect<.35?'lower':s.indirect>.65?'higher':'moderate'}. ${result.toLowerCase()}.`;}
+slider.addEventListener('input',render);render();
+</script>
+</body>
+</html>
